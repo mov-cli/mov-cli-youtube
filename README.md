@@ -5,8 +5,6 @@
 
 </div>
 
-<br>
-
 ## Installation
 Here's how to install and add the plugin to mov-cli.
 
