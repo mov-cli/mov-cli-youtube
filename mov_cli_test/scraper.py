@@ -7,6 +7,8 @@ if TYPE_CHECKING:
     from mov_cli import Config
     from mov_cli.http_client import HTTPClient
 
+from pytube import YouTube
+
 from mov_cli import utils
 from mov_cli.scraper import Scraper
 from mov_cli import Series, Movie, Metadata, MetadataType
@@ -29,17 +31,18 @@ class TestScraper(Scraper):
         return self.creative_common_films # NOTE: In my case I already know the media so let's just my hardcoded metadata.
 
     def scrape(self, metadata: Metadata, episode: Optional[utils.EpisodeSelector] = None) -> Series | Movie:
-        url = metadata.id
-
         if episode is None:
             episode = utils.EpisodeSelector()
+
+        video = YouTube(metadata.id)
+        url = video.streams.get_highest_resolution().url
 
         # NOTE: I could have just dropped series as all the media in my list are 
         # films and not series but I'll leave it in here as an example.
         if metadata.type == MetadataType.SERIES:
             return Series(
                 url = url, 
-                title = metadata.title, 
+                title = video.title, 
                 referrer = url, 
                 episode = episode.episode, 
                 season = episode.season,
@@ -48,7 +51,7 @@ class TestScraper(Scraper):
 
         return Movie(
             url = url, 
-            title = metadata.title, 
+            title = video.title, 
             referrer = url, 
             year = metadata.year,
             subtitles = None
