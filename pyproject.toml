@@ -1,6 +1,6 @@
 [project]
-name = "mov-cli-test"
-description = "A mov-cli plugin that let's you test mov-cli's capabilities by watching free films and animations in the creative commons."
+name = "mov-cli-youtube"
+description = "A mov-cli v4 plugin for watching youtube."
 authors = [
     {name = "Goldy", email = "goldy@devgoldy.xyz"}
 ]
@@ -36,15 +36,15 @@ dev = [
 ]
 
 [project.urls]
-GitHub = "https://github.com/THEGOLDENPRO/mov-cli-test"
-BugTracker = "https://github.com/THEGOLDENPRO/mov-cli-test/issues"
+GitHub = "https://github.com/mov-cli/mov-cli-youtube"
+BugTracker = "https://github.com/mov-cli/mov-cli-youtube/issues"
 
 [tool.setuptools.dynamic]
-version = { attr = "mov_cli_test.__version__" }
+version = { attr = "mov_cli_youtube.__version__" }
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["mov_cli_test*"]
+include = ["mov_cli_youtube*"]

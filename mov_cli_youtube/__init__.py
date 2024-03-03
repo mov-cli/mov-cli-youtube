@@ -2,7 +2,7 @@ from .scraper import *
 
 plugin = {
     "scrapers": {
-        "test": TestScraper
+        "youtube": YouTubeScraper
     }
 }
 
