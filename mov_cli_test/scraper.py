@@ -16,7 +16,8 @@ __all__ = ("TestScraper",)
 class TestScraper(Scraper):
     def __init__(self, config: Config, http_client: HTTPClient) -> None:
         self.creative_common_films = [
-            Metadata(id = "https://youtu.be/aqz-KE-bpKQ", title = "Big Buck Bunny", type = MetadataType.MOVIE, year = "2008")
+            Metadata(id = "https://youtu.be/aqz-KE-bpKQ", title = "Big Buck Bunny", type = MetadataType.MOVIE, year = "2008"),
+            Metadata(id = "https://www.youtube.com/watch?v=BBgghnQF6E4", title = "Steamboat Willie", type = MetadataType.MOVIE, year = "1928")
         ]
 
         super().__init__(config, http_client)
