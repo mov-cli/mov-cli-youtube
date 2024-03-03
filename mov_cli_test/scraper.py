@@ -19,7 +19,8 @@ class TestScraper(Scraper):
     def __init__(self, config: Config, http_client: HTTPClient) -> None:
         self.creative_common_films = [
             Metadata(id = "https://youtu.be/aqz-KE-bpKQ", title = "Big Buck Bunny", type = MetadataType.MOVIE, year = "2008"),
-            Metadata(id = "https://www.youtube.com/watch?v=BBgghnQF6E4", title = "Steamboat Willie", type = MetadataType.MOVIE, year = "1928")
+            Metadata(id = "https://www.youtube.com/watch?v=BBgghnQF6E4", title = "Steamboat Willie", type = MetadataType.MOVIE, year = "1928"),
+            Metadata(id = "https://cdn.devgoldy.xyz/ricky.webm", title = "Ricky :)", type = MetadataType.MOVIE, year = "2009")
         ]
 
         super().__init__(config, http_client)
@@ -34,15 +35,14 @@ class TestScraper(Scraper):
         if episode is None:
             episode = utils.EpisodeSelector()
 
-        video = YouTube(metadata.id)
-        url = video.streams.get_highest_resolution().url
+        url = metadata.id
 
         # NOTE: I could have just dropped series as all the media in my list are 
         # films and not series but I'll leave it in here as an example.
         if metadata.type == MetadataType.SERIES:
             return Series(
                 url = url, 
-                title = video.title, 
+                title = metadata.title, 
                 referrer = url, 
                 episode = episode.episode, 
                 season = episode.season,
@@ -51,7 +51,7 @@ class TestScraper(Scraper):
 
         return Movie(
             url = url, 
-            title = video.title, 
+            title = metadata.title, 
             referrer = url, 
             year = metadata.year,
             subtitles = None
