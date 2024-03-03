@@ -37,6 +37,9 @@ class TestScraper(Scraper):
 
         url = metadata.id
 
+        if "https://youtu.be" in url:
+            url = YouTube(url).streams.get_highest_resolution().url
+
         # NOTE: I could have just dropped series as all the media in my list are 
         # films and not series but I'll leave it in here as an example.
         if metadata.type == MetadataType.SERIES:
