@@ -28,5 +28,5 @@ youtube = "mov-cli-youtube"
 
 ## Usage
 ```sh
-mov-cli nyan cat --scraper youtube
+mov-cli -s youtube nyan cat
 ```
