@@ -15,7 +15,7 @@ Here's how to install and add the plugin to mov-cli.
 
 1. Install the pip package.
 ```sh
-pip install git+https://github.com/mov-cli/mov-cli-youtube
+pip install mov-cli-youtube
 ```
 2. Then add the plugin to your mov-cli config.
 ```sh
