@@ -27,7 +27,7 @@ class YouTubeScraper(Scraper):
 
         max_videos = 20 if limit is None else limit
 
-        # suppress pytube's stupid errors from getting to the console and ruining fzf.
+        # suppress pytube's stupid errors from getting to the console and ruining fzf output.
         sys.stderr = open(os.devnull, "w")
 
         for index, video in enumerate(search_results):
@@ -54,7 +54,7 @@ class YouTubeScraper(Scraper):
         return Movie(
             url = url, 
             title = metadata.title, 
-            referrer = url, 
+            referrer = "", 
             year = metadata.year, 
             subtitles = None
         )
