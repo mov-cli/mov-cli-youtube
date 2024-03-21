@@ -59,6 +59,6 @@ class YouTubeScraper(Scraper):
             subtitles = None
         )
 
-    def scrape_metadata_episodes(self, metadata: Metadata) -> Dict[int | None, int]:
+    def scrape_episodes(self, metadata: Metadata, *kwargs) -> Dict[None, int]:
         # Returning None as search does not return any metadata of type series.
         return {None: 1}
