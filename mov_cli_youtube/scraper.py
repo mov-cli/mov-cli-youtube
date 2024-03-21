@@ -36,7 +36,7 @@ class YouTubeScraper(Scraper):
 
             yield Metadata(
                 id = video.watch_url, 
-                title = video.title, 
+                title = f"{video.title} ~ {video.author}", 
                 type = MetadataType.MOVIE, 
                 year = str(video.publish_date.year)
             )
