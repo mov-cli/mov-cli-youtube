@@ -4,13 +4,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from mov_cli.plugins import PluginHookData
 
-from .scraper import *
+from .youtube import *
 
 plugin: PluginHookData = {
     "version": 1, 
     "scrapers": {
-        "DEFAULT": YouTubeScraper
+        "DEFAULT": YouTubeScraper, 
     }
 }
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
