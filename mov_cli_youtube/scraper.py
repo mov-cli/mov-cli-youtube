@@ -44,7 +44,7 @@ class YouTubeScraper(Scraper):
         # restore the console.
         sys.stderr = sys.__stderr__
 
-    def scrape(self, metadata: Metadata, episode: Optional[utils.EpisodeSelector] = None) -> Series | Movie:
+    def scrape(self, metadata: Metadata, episode: Optional[utils.EpisodeSelector] = None, **kwargs) -> Series | Movie:
         if episode is None:
             episode = utils.EpisodeSelector()
 
@@ -59,6 +59,6 @@ class YouTubeScraper(Scraper):
             subtitles = None
         )
 
-    def scrape_episodes(self, metadata: Metadata, *kwargs) -> Dict[None, int]:
+    def scrape_episodes(self, metadata: Metadata, **kwargs) -> Dict[None, int]:
         # Returning None as search does not return any metadata of type series.
         return {None: 1}
