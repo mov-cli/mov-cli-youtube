@@ -7,10 +7,10 @@
 
 </div>
 
-> [!Warning]
-> Currently work in progress.
+> [!NOTE]
+> Currently work in progress, expect slow speeds.
 
-## Installation
+## Installation 🛠️
 Here's how to install and add the plugin to mov-cli.
 
 1. Install the pip package.
@@ -26,7 +26,12 @@ mov-cli -e
 youtube = "mov-cli-youtube"
 ```
 
-## Usage
+## Usage 🖱️
 ```sh
 mov-cli -s youtube nyan cat
+```
+
+### Audio Only 🔉
+```sh
+mov-cli -s youtube nyan cat -- --audio
 ```
