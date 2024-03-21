@@ -44,12 +44,19 @@ class YouTubeScraper(Scraper):
         # restore the console.
         sys.stderr = sys.__stderr__
 
-    def scrape(self, metadata: Metadata, episode: Optional[utils.EpisodeSelector] = None, **kwargs) -> Series | Movie:
+    def scrape(self, metadata: Metadata, episode: Optional[utils.EpisodeSelector] = None, **kwargs: Dict[str, bool]) -> Series | Movie:
+        audio_only: bool = kwargs.get("audio", False)
+
         if episode is None:
             episode = utils.EpisodeSelector()
 
         watch_url = metadata.id
-        url = YouTube(watch_url).streams.get_highest_resolution().url
+        video = YouTube(watch_url)
+
+        if audio_only:
+            url = video.streams.get_audio_only().url
+        else:
+            url = video.streams.get_highest_resolution().url
 
         return Movie(
             url = url, 
