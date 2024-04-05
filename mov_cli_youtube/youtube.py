@@ -56,7 +56,13 @@ class YouTubeScraper(Scraper):
         if audio_only:
             url = video.streams.get_audio_only().url
         else:
-            url = video.streams.get_highest_resolution().url
+            if self.config.resolution is not None:
+                url = video.streams.get_by_resolution(f"{self.config.resolution}p").url
+                
+                if url is None:
+                    url = video.streams.get_highest_resolution().url
+            else:
+                url = video.streams.get_highest_resolution().url
 
         return Movie(
             url = url, 
