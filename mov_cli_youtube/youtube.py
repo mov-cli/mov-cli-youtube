@@ -46,11 +46,8 @@ class YouTubeScraper(Scraper):
         sys.stderr = sys.__stderr__
 
     # NOTE: I left kwargs here so it doesn't break post v4.3 mov-cli versions just yet.
-    def scrape(self, metadata: Metadata, episode: Optional[EpisodeSelector] = None, **kwargs) -> Single:
+    def scrape(self, metadata: Metadata, episode: EpisodeSelector, **kwargs) -> Single:
         audio_only: bool = self.options.get("audio", False)
-
-        if episode is None:
-            episode = EpisodeSelector()
 
         watch_url = metadata.id
         video = YouTube(watch_url)
