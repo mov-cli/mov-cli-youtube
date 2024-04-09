@@ -6,20 +6,21 @@ if TYPE_CHECKING:
 
     from mov_cli import Config
     from mov_cli.http_client import HTTPClient
+    from mov_cli.scraper import ScraperOptionsT
 
 import os
 import sys
 from pytube import YouTube, Search
 
-from mov_cli import utils
 from mov_cli.scraper import Scraper
-from mov_cli import Series, Movie, Metadata, MetadataType
+from mov_cli.utils import EpisodeSelector
+from mov_cli import Single, Metadata, MetadataType
 
 __all__ = ("YouTubeScraper",)
 
 class YouTubeScraper(Scraper):
-    def __init__(self, config: Config, http_client: HTTPClient) -> None:
-        super().__init__(config, http_client)
+    def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
+        super().__init__(config, http_client, options)
 
     def search(self, query: str, limit: int = None) -> Generator[Metadata, Any, None]:
         search_query = Search(query)
@@ -44,11 +45,12 @@ class YouTubeScraper(Scraper):
         # restore the console.
         sys.stderr = sys.__stderr__
 
-    def scrape(self, metadata: Metadata, episode: Optional[utils.EpisodeSelector] = None, **kwargs: Dict[str, bool]) -> Series | Movie:
-        audio_only: bool = kwargs.get("audio", False)
+    # NOTE: I left kwargs here so it doesn't break post v4.3 mov-cli versions just yet.
+    def scrape(self, metadata: Metadata, episode: Optional[EpisodeSelector] = None, **kwargs) -> Single:
+        audio_only: bool = self.options.get("audio", False)
 
         if episode is None:
-            episode = utils.EpisodeSelector()
+            episode = EpisodeSelector()
 
         watch_url = metadata.id
         video = YouTube(watch_url)
@@ -58,18 +60,16 @@ class YouTubeScraper(Scraper):
         else:
             if self.config.resolution is not None:
                 url = video.streams.get_by_resolution(f"{self.config.resolution}p").url
-                
+
                 if url is None:
                     url = video.streams.get_highest_resolution().url
             else:
                 url = video.streams.get_highest_resolution().url
 
-        return Movie(
+        return Single(
             url = url, 
             title = metadata.title, 
-            referrer = "", 
-            year = metadata.year, 
-            subtitles = None
+            year = metadata.year
         )
 
     def scrape_episodes(self, metadata: Metadata, **kwargs) -> Dict[None, int]:
