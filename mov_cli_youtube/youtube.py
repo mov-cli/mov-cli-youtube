@@ -13,7 +13,7 @@ from pytube import YouTube
 
 from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
-from mov_cli import Series, Movie, Metadata, MetadataType
+from mov_cli import Single, Metadata, MetadataType
 
 __all__ = ("YouTubeScraper",)
 
@@ -45,7 +45,7 @@ class YouTubeScraper(Scraper):
                 yield Metadata(
                     id = key["url"], 
                     title = f"{key['title']} ~ {key['uploader']}", 
-                    type = MetadataType.MOVIE, 
+                    type = MetadataType.SINGLE, 
                     year = key["release_timestamp"]
                 )
 
@@ -53,7 +53,7 @@ class YouTubeScraper(Scraper):
         self, 
         metadata: Metadata, 
         _: EpisodeSelector
-    ) -> Series | Movie:
+    ) -> Single:
 
         watch_url = metadata.id
         video = YouTube(watch_url)
@@ -63,12 +63,10 @@ class YouTubeScraper(Scraper):
         else:
             url = video.streams.get_highest_resolution().url
 
-        return Movie(
+        return Single(
             url = url, 
             title = metadata.title, 
-            referrer = "", 
-            year = metadata.year, 
-            subtitles = None
+            year = metadata.year
         )
 
     def scrape_episodes(self, _: Metadata) -> Dict[None, int]:
