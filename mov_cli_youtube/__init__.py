@@ -8,6 +8,7 @@ from .youtube import *
 
 plugin: PluginHookData = {
     "version": 1, 
+    "package_name": "mov-cli-youtube", 
     "scrapers": {
         "DEFAULT": YouTubeScraper, 
     }
