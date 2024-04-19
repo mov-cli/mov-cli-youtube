@@ -9,10 +9,10 @@ if TYPE_CHECKING:
     from mov_cli.scraper import ScraperOptionsT
 
 import yt_dlp
-#from pytube import YouTube
+from pytube import YouTube
 
 from mov_cli.scraper import Scraper
-from mov_cli.utils import EpisodeSelector
+from mov_cli.utils import EpisodeSelector, what_platform
 from mov_cli import Single, Metadata, MetadataType
 
 __all__ = ("YouTubeScraper",)
@@ -63,26 +63,33 @@ class YouTubeScraper(Scraper):
             "quiet": False if self.config.debug else True
         }
 
-        with yt_dlp.YoutubeDL(yt_options) as ydl:
-            info = ydl.extract_info(watch_url, download = False)
+        platform = what_platform()
 
-            url = self.__get_best_stream(
-                info, 
-                video = False if self.options.get("audio", False) else True, 
-                audio = True
-            )
+        audio_url = None
 
-        """
-        video = YouTube(watch_url)
+        if not platform == "Android" and not platform == "iOS":
 
-        if self.options.get("audio", False):
-            url = video.streams.get_audio_only().url
-        else:
-            url = video.streams.get_highest_resolution().url
-        """
+            with yt_dlp.YoutubeDL(yt_options) as ydl:
+                info = ydl.extract_info(watch_url, download = False)
+
+                if self.options.get("audio", False):
+                    url = self.__get_best_stream(info, audio = True)
+                else:
+                    url = self.__get_best_stream(info, video = True)
+                    audio_url = self.__get_best_stream(info, audio = True)
+
+        else: # Fall back to pytube on iOS and Android as their players can't take audio_url. 
+            # Sadly this will result in lower resolution as pytube doesn't seem to pick up higher resolutions well.
+            pytube_video = YouTube(watch_url)
+
+            if self.options.get("audio", False):
+                url = pytube_video.streams.get_audio_only().url
+            else:
+                url = pytube_video.streams.get_highest_resolution().url
 
         return Single(
             url = url, 
+            audio_url = audio_url, 
             title = metadata.title, 
             year = metadata.year
         )
@@ -91,7 +98,7 @@ class YouTubeScraper(Scraper):
         # Returning None as search does not return any metadata of type series.
         return {None: 1}
 
-    def __get_best_stream(self, ytdlp_info: dict, video: bool, audio: bool) -> str:
+    def __get_best_stream(self, ytdlp_info: dict, video: bool = False, audio: bool = False) -> str:
         """Returns the best stream respecting the parameters given."""
         stream_formats_to_sort: List[Tuple[int, str]] = []
 
@@ -108,8 +115,8 @@ class YouTubeScraper(Scraper):
 
             stream_formats_to_sort.append((quality, url))
 
-        stream_formats_to_sort.sort(key = lambda x: x[0])
-        return stream_formats_to_sort[0]
+        stream_formats_to_sort.sort(key = lambda x: x[0], reverse = True)
+        return stream_formats_to_sort[0][1]
 
     def __yt_dlp_filter(self, shorts: bool = False, **kwargs):
 
