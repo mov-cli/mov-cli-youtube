@@ -45,8 +45,7 @@ class YouTubeScraper(Scraper):
         # restore the console.
         sys.stderr = sys.__stderr__
 
-    # NOTE: I left kwargs here so it doesn't break post v4.3 mov-cli versions just yet.
-    def scrape(self, metadata: Metadata, episode: EpisodeSelector, **kwargs) -> Single:
+    def scrape(self, metadata: Metadata, _: EpisodeSelector) -> Single:
         audio_only: bool = self.options.get("audio", False)
 
         watch_url = metadata.id
@@ -54,14 +53,15 @@ class YouTubeScraper(Scraper):
 
         if audio_only:
             url = video.streams.get_audio_only().url
-        else:
-            if self.config.resolution is not None:
-                url = video.streams.get_by_resolution(f"{self.config.resolution}p").url
 
-                if url is None:
-                    url = video.streams.get_highest_resolution().url
-            else:
-                url = video.streams.get_highest_resolution().url
+        elif self.config.resolution is not None:
+            url = video.streams.get_by_resolution(f"{self.config.resolution}p").url
+
+            if url is None:
+                url = video.streams.filter(progressive = False).order_by("resolution").last().url
+
+        else:
+            url = video.streams.filter(progressive = False).order_by("resolution").last().url
 
         return Single(
             url = url, 
