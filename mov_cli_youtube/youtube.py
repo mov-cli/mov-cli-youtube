@@ -25,7 +25,7 @@ class YouTubeScraper(Scraper):
         max_videos = 100 if limit is None else limit
 
         yt_options = {
-            "noplaylist":"True", 
+            "noplaylist": "True", 
             "default_search": "ytsearch", 
             "nocheckcertificate": True, 
             "geo_bypass": True, 
@@ -44,8 +44,7 @@ class YouTubeScraper(Scraper):
                 yield Metadata(
                     id = key["url"], 
                     title = f"{key['title']} ~ {key['uploader']}", 
-                    type = MetadataType.SINGLE, 
-                    year = key["release_timestamp"]
+                    type = MetadataType.SINGLE
                 )
 
     def scrape(
