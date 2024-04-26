@@ -9,20 +9,19 @@ if TYPE_CHECKING:
     from mov_cli.scraper import ScraperOptionsT
 
 import yt_dlp
-from pytube import YouTube
 
 from mov_cli.scraper import Scraper
-from mov_cli.utils import EpisodeSelector, what_platform
+from mov_cli.utils import EpisodeSelector
 from mov_cli import Single, Metadata, MetadataType
 
-__all__ = ("YouTubeScraper",)
+__all__ = ("YTDlpScraper",)
 
-class YouTubeScraper(Scraper):
+class YTDlpScraper(Scraper):
     def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
         super().__init__(config, http_client, options)
 
     def search(self, query: str, limit: Optional[int] = None) -> Generator[Metadata, Any, None]:
-        max_videos = 100 if limit is None else limit
+        max_videos = 70 if limit is None else limit
 
         yt_options = {
             "noplaylist": "True", 
@@ -62,29 +61,16 @@ class YouTubeScraper(Scraper):
             "quiet": False if self.config.debug else True
         }
 
-        platform = what_platform()
-
         audio_url = None
 
-        if not platform == "Android" and not platform == "iOS":
-
-            with yt_dlp.YoutubeDL(yt_options) as ydl:
-                info = ydl.extract_info(watch_url, download = False)
-
-                if self.options.get("audio", False):
-                    url = self.__get_best_stream(info, audio = True)
-                else:
-                    url = self.__get_best_stream(info, video = True)
-                    audio_url = self.__get_best_stream(info, audio = True)
-
-        else: # Fall back to pytube on iOS and Android as their players can't take audio_url. 
-            # Sadly this will result in lower resolution as pytube doesn't seem to pick up higher resolutions well.
-            pytube_video = YouTube(watch_url)
+        with yt_dlp.YoutubeDL(yt_options) as ydl:
+            info = ydl.extract_info(watch_url, download = False)
 
             if self.options.get("audio", False):
-                url = pytube_video.streams.get_audio_only().url
+                url = self.__get_best_stream(info, audio = True)
             else:
-                url = pytube_video.streams.get_highest_resolution().url
+                url = self.__get_best_stream(info, video = True)
+                audio_url = self.__get_best_stream(info, audio = True)
 
         return Single(
             url = url, 
