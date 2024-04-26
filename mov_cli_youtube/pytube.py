@@ -58,10 +58,10 @@ class PyTubeScraper(Scraper):
             url = video.streams.get_by_resolution(f"{self.config.resolution}p").url
 
             if url is None:
-                url = video.streams.filter(progressive = False).order_by("resolution").last().url
+                url = video.streams.get_highest_resolution().url
 
         else:
-            url = video.streams.filter(progressive = False).order_by("resolution").last().url
+            url = video.streams.get_highest_resolution().url
 
         return Single(
             url = url, 
