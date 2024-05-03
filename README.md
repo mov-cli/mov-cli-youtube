@@ -7,9 +7,6 @@
 
 </div>
 
-> [!NOTE]
-> Currently work in progress, expect slow speeds.
-
 ## Installation 🛠️
 Here's how to install and add the plugin to mov-cli.
 
