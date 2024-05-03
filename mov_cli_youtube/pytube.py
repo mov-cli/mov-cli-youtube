@@ -16,9 +16,9 @@ from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
 from mov_cli import Single, Metadata, MetadataType
 
-__all__ = ("YouTubeScraper",)
+__all__ = ("PyTubeScraper",)
 
-class YouTubeScraper(Scraper):
+class PyTubeScraper(Scraper):
     def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
         super().__init__(config, http_client, options)
 
@@ -58,10 +58,10 @@ class YouTubeScraper(Scraper):
             url = video.streams.get_by_resolution(f"{self.config.resolution}p").url
 
             if url is None:
-                url = video.streams.filter(progressive = False).order_by("resolution").last().url
+                url = video.streams.get_highest_resolution().url
 
         else:
-            url = video.streams.filter(progressive = False).order_by("resolution").last().url
+            url = video.streams.get_highest_resolution().url
 
         return Single(
             url = url, 
