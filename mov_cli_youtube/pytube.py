@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 import os
 import sys
-from pytube import YouTube, Search
+from pytubefix import YouTube, Search
 
 from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
@@ -24,7 +24,7 @@ class PyTubeScraper(Scraper):
 
     def search(self, query: str, limit: int = None) -> Generator[Metadata, Any, None]:
         search_query = Search(query)
-        search_results: List[YouTube] = search_query.results
+        search_results: List[YouTube] = search_query.videos
 
         max_videos = 20 if limit is None else limit
 
