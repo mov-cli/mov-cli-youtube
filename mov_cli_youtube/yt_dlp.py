@@ -12,7 +12,7 @@ import yt_dlp
 
 from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
-from mov_cli import Single, Metadata, MetadataType
+from mov_cli import Single, Metadata, MetadataType, ExtraMetadata
 
 __all__ = ("YTDlpScraper",)
 
@@ -39,11 +39,12 @@ class YTDlpScraper(Scraper):
             info = ydl.extract_info(f"ytsearch{max_videos}:{query}", download = False)
 
             for key in info["entries"]:
-
                 yield Metadata(
                     id = key["url"], 
                     title = f"{key['title']} ~ {key['uploader']}", 
-                    type = MetadataType.SINGLE
+                    type = MetadataType.SINGLE,
+                    extra_func = lambda: self.__scrape_extra(key)
+                    
                 )
 
     def scrape(
@@ -112,3 +113,13 @@ class YTDlpScraper(Scraper):
                 return "Video is a YouTube short. Pass '--shorts' to the scraper to scrape for them."
 
         return filter
+
+    def __scrape_extra(self, key: dict) -> ExtraMetadata:
+        with yt_dlp.YoutubeDL() as ydl:
+            info = ydl.extract_info(key["url"], download = False)
+
+        return ExtraMetadata(
+            description = info["description"],
+            image_url = info["thumbnail"],
+            genres = info["categories"]
+        )
