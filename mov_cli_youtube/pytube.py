@@ -14,7 +14,7 @@ from pytubefix import YouTube, Search
 
 from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
-from mov_cli import Single, Metadata, MetadataType
+from mov_cli import Single, Metadata, MetadataType, ExtraMetadata
 
 __all__ = ("PyTubeScraper",)
 
@@ -39,7 +39,8 @@ class PyTubeScraper(Scraper):
                 id = video.watch_url, 
                 title = f"{video.title} ~ {video.author}", 
                 type = MetadataType.MOVIE, 
-                year = str(video.publish_date.year)
+                year = str(video.publish_date.year),
+                extra_func = lambda: self.__scrape_extra(video)
             )
 
         # restore the console.
@@ -72,3 +73,9 @@ class PyTubeScraper(Scraper):
     def scrape_episodes(self, metadata: Metadata, **kwargs) -> Dict[None, int]:
         # Returning None as search does not return any metadata of type series.
         return {None: 1}
+
+    def __scrape_extra(self, key: YouTube) -> ExtraMetadata:
+        return ExtraMetadata(
+            description = key.description,
+            image_url = key.thumbnail_url,
+        )
