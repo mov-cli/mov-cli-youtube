@@ -75,7 +75,6 @@ class PyTubeScraper(Scraper):
         return {None: 1}
 
     def __scrape_extra(self, key: YouTube) -> ExtraMetadata:
-
         return ExtraMetadata(
             description = key.description,
             image_url = key.thumbnail_url,
