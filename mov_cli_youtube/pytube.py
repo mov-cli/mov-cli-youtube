@@ -10,21 +10,21 @@ if TYPE_CHECKING:
 
 import os
 import sys
-from pytube import YouTube, Search
+from pytubefix import YouTube, Search
 
 from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
-from mov_cli import Single, Metadata, MetadataType
+from mov_cli import Single, Metadata, MetadataType, ExtraMetadata
 
-__all__ = ("YouTubeScraper",)
+__all__ = ("PyTubeScraper",)
 
-class YouTubeScraper(Scraper):
+class PyTubeScraper(Scraper):
     def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
         super().__init__(config, http_client, options)
 
     def search(self, query: str, limit: int = None) -> Generator[Metadata, Any, None]:
         search_query = Search(query)
-        search_results: List[YouTube] = search_query.results
+        search_results: List[YouTube] = search_query.videos
 
         max_videos = 20 if limit is None else limit
 
@@ -39,7 +39,8 @@ class YouTubeScraper(Scraper):
                 id = video.watch_url, 
                 title = f"{video.title} ~ {video.author}", 
                 type = MetadataType.MOVIE, 
-                year = str(video.publish_date.year)
+                year = str(video.publish_date.year),
+                extra_func = lambda: self.__scrape_extra(video)
             )
 
         # restore the console.
@@ -58,10 +59,10 @@ class YouTubeScraper(Scraper):
             url = video.streams.get_by_resolution(f"{self.config.resolution}p").url
 
             if url is None:
-                url = video.streams.filter(progressive = False).order_by("resolution").last().url
+                url = video.streams.get_highest_resolution().url
 
         else:
-            url = video.streams.filter(progressive = False).order_by("resolution").last().url
+            url = video.streams.get_highest_resolution().url
 
         return Single(
             url = url, 
@@ -72,3 +73,9 @@ class YouTubeScraper(Scraper):
     def scrape_episodes(self, metadata: Metadata, **kwargs) -> Dict[None, int]:
         # Returning None as search does not return any metadata of type series.
         return {None: 1}
+
+    def __scrape_extra(self, key: YouTube) -> ExtraMetadata:
+        return ExtraMetadata(
+            description = key.description,
+            image_url = key.thumbnail_url,
+        )

@@ -24,7 +24,8 @@ dependencies = [
     "requests",
     "importlib-metadata; python_version<'3.8'",
 
-    "pytube"
+    "pytubefix",
+    "yt-dlp>=2024.4.9"
 ]
 
 dynamic = ["version"]
