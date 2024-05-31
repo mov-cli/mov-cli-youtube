@@ -80,13 +80,11 @@ class YTDlpScraper(Scraper):
                         if caption.get("ext") == "vtt":
                             subtitle = caption.get("url")
 
-
             for lang_code, caption_data in info.get("subtitles", {}).items():
                 if lang_code.startswith(self.config.language.iso639_1):
                     for caption in caption_data:
                         if caption.get("ext") == "vtt":
                             subtitle = caption.get("url")
-                
 
         return Single(
             url = url, 
@@ -95,10 +93,6 @@ class YTDlpScraper(Scraper):
             year = metadata.year,
             subtitles = subtitle
         )
-
-    def scrape_episodes(self, _: Metadata) -> Dict[None, int]:
-        # Returning None as search does not return any metadata of type series.
-        return {None: 1}
 
     def __get_best_stream(self, ytdlp_info: dict, video: bool = False, audio: bool = False) -> str:
         """Returns the best stream respecting the parameters given."""
