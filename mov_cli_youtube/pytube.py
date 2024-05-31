@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Optional, Dict, Generator, Any
+    from typing import List, Optional, Generator, Any
 
     from mov_cli import Config
     from mov_cli.http_client import HTTPClient
@@ -16,13 +16,16 @@ from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
 from mov_cli import Single, Metadata, MetadataType, ExtraMetadata
 
+from mov_cli.media import Quality
+from mov_cli.utils import get_temp_directory, what_platform
+
 __all__ = ("PyTubeScraper",)
 
 class PyTubeScraper(Scraper):
     def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
         super().__init__(config, http_client, options)
 
-    def search(self, query: str, limit: int = None) -> Generator[Metadata, Any, None]:
+    def search(self, query: str, limit: Optional[int] = None) -> Generator[Metadata, Any, None]:
         search_query = Search(query)
         search_results: List[YouTube] = search_query.videos
 
@@ -38,7 +41,7 @@ class PyTubeScraper(Scraper):
             yield Metadata(
                 id = video.watch_url, 
                 title = f"{video.title} ~ {video.author}", 
-                type = MetadataType.MOVIE, 
+                type = MetadataType.SINGLE, 
                 year = str(video.publish_date.year),
                 extra_func = lambda: self.__scrape_extra(video)
             )
@@ -48,6 +51,7 @@ class PyTubeScraper(Scraper):
 
     def scrape(self, metadata: Metadata, _: EpisodeSelector) -> Single:
         audio_only: bool = self.options.get("audio", False)
+        subtitle = None
 
         watch_url = metadata.id
         video = YouTube(watch_url)
@@ -55,24 +59,34 @@ class PyTubeScraper(Scraper):
         if audio_only:
             url = video.streams.get_audio_only().url
 
-        elif self.config.resolution is not None:
-            url = video.streams.get_by_resolution(f"{self.config.resolution}p").url
+        elif not self.config.resolution == Quality.AUTO:
+            url = video.streams.get_by_resolution(self.config.resolution.apply_p()).url
 
             if url is None:
                 url = video.streams.get_highest_resolution().url
 
         else:
             url = video.streams.get_highest_resolution().url
+    
+        for caption in video.captions:
+            if caption.code.startswith(self.config.language.iso639_1):
+                platform = what_platform()
+
+                temp = get_temp_directory(platform).joinpath(video.video_id)
+
+                with temp.open("w", encoding = "utf-8") as f:
+                    f.write(
+                        caption.generate_srt_captions()
+                    )
+                
+                subtitle = temp
 
         return Single(
             url = url, 
             title = metadata.title, 
-            year = metadata.year
+            year = metadata.year,
+            subtitles = subtitle
         )
-
-    def scrape_episodes(self, metadata: Metadata, **kwargs) -> Dict[None, int]:
-        # Returning None as search does not return any metadata of type series.
-        return {None: 1}
 
     def __scrape_extra(self, key: YouTube) -> ExtraMetadata:
         return ExtraMetadata(

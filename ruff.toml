@@ -1,0 +1,5 @@
+# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
+# lint.select = ["E", "F"]
+lint.ignore = ["E501", "E402", "E702", "E701", "E731", "F405", "F403"]
+
+target-version = "py38"

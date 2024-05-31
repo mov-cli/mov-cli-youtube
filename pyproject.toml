@@ -2,7 +2,8 @@
 name = "mov-cli-youtube"
 description = "A mov-cli v4 plugin for watching youtube."
 authors = [
-    {name = "Goldy", email = "goldy@devgoldy.xyz"}
+    {name = "Goldy", email = "goldy@devgoldy.xyz"},
+    {name = "Ananas", email = "ananas@ananas.moe"}
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.8"

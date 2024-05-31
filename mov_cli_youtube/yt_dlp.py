@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional, Dict, Generator, Any, List, Tuple
+    from typing import Optional, Generator, Any, List, Tuple
 
     from mov_cli import Config
     from mov_cli.http_client import HTTPClient
@@ -52,6 +52,7 @@ class YTDlpScraper(Scraper):
         metadata: Metadata, 
         _: EpisodeSelector
     ) -> Single:
+        subtitle = None
 
         watch_url = metadata.id
 
@@ -73,16 +74,25 @@ class YTDlpScraper(Scraper):
                 url = self.__get_best_stream(info, video = True)
                 audio_url = self.__get_best_stream(info, audio = True)
 
+            for lang_code, caption_data in info.get("automatic_captions", {}).items():
+                if lang_code == self.config.language.iso639_1:
+                    for caption in caption_data:
+                        if caption.get("ext") == "vtt":
+                            subtitle = caption.get("url")
+
+            for lang_code, caption_data in info.get("subtitles", {}).items():
+                if lang_code.startswith(self.config.language.iso639_1):
+                    for caption in caption_data:
+                        if caption.get("ext") == "vtt":
+                            subtitle = caption.get("url")
+
         return Single(
             url = url, 
             audio_url = audio_url, 
             title = metadata.title, 
-            year = metadata.year
+            year = metadata.year,
+            subtitles = subtitle
         )
-
-    def scrape_episodes(self, _: Metadata) -> Dict[None, int]:
-        # Returning None as search does not return any metadata of type series.
-        return {None: 1}
 
     def __get_best_stream(self, ytdlp_info: dict, video: bool = False, audio: bool = False) -> str:
         """Returns the best stream respecting the parameters given."""
