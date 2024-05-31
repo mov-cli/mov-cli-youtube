@@ -48,6 +48,7 @@ class PyTubeScraper(Scraper):
 
     def scrape(self, metadata: Metadata, _: EpisodeSelector) -> Single:
         audio_only: bool = self.options.get("audio", False)
+        subtitles = []
 
         watch_url = metadata.id
         video = YouTube(watch_url)
@@ -63,11 +64,17 @@ class PyTubeScraper(Scraper):
 
         else:
             url = video.streams.get_highest_resolution().url
+    
+        for _, caption in video.captions.items():
+            subtitles.append(
+                caption.url
+            )
 
         return Single(
             url = url, 
             title = metadata.title, 
-            year = metadata.year
+            year = metadata.year,
+            subtitles = subtitles
         )
 
     def scrape_episodes(self, metadata: Metadata, **kwargs) -> Dict[None, int]:

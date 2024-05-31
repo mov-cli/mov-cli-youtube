@@ -52,6 +52,7 @@ class YTDlpScraper(Scraper):
         metadata: Metadata, 
         _: EpisodeSelector
     ) -> Single:
+        subtitle = None
 
         watch_url = metadata.id
 
@@ -73,11 +74,26 @@ class YTDlpScraper(Scraper):
                 url = self.__get_best_stream(info, video = True)
                 audio_url = self.__get_best_stream(info, audio = True)
 
+            for lang_code, caption_data in info.get("automatic_captions", {}).items():
+                if lang_code == self.config.language.iso639_1:
+                    for caption in caption_data:
+                        if caption.get("ext") == "vtt":
+                            subtitle = caption.get("url")
+
+
+            for lang_code, caption_data in info.get("subtitles", {}).items():
+                if lang_code.startswith(self.config.language.iso639_1):
+                    for caption in caption_data:
+                        if caption.get("ext") == "vtt":
+                            subtitle = caption.get("url")
+                
+
         return Single(
             url = url, 
             audio_url = audio_url, 
             title = metadata.title, 
-            year = metadata.year
+            year = metadata.year,
+            subtitles = subtitle
         )
 
     def scrape_episodes(self, _: Metadata) -> Dict[None, int]:
