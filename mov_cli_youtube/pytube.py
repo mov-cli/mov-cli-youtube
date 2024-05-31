@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Optional, Dict, Generator, Any
+    from typing import List, Optional, Generator, Any
 
     from mov_cli import Config
     from mov_cli.http_client import HTTPClient
