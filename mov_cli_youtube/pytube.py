@@ -25,7 +25,7 @@ class PyTubeScraper(Scraper):
     def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
         super().__init__(config, http_client, options)
 
-    def search(self, query: str, limit: int = None) -> Generator[Metadata, Any, None]:
+    def search(self, query: str, limit: Optional[int] = None) -> Generator[Metadata, Any, None]:
         search_query = Search(query)
         search_results: List[YouTube] = search_query.videos
 
