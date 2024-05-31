@@ -59,7 +59,7 @@ class PyTubeScraper(Scraper):
         if audio_only:
             url = video.streams.get_audio_only().url
 
-        elif self.config.resolution is not Quality.AUTO:
+        elif not self.config.resolution == Quality.AUTO:
             url = video.streams.get_by_resolution(self.config.resolution.apply_p()).url
 
             if url is None:
