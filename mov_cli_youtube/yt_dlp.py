@@ -63,6 +63,7 @@ class YTDlpScraper(Scraper):
             "quiet": False if self.config.debug else True
         }
 
+        subtitles = []
         audio_url = None
 
         with yt_dlp.YoutubeDL(yt_options) as ydl:
@@ -78,20 +79,20 @@ class YTDlpScraper(Scraper):
                 if lang_code == self.config.language.iso639_1:
                     for caption in caption_data:
                         if caption.get("ext") == "vtt":
-                            subtitle = caption.get("url")
+                            subtitles.append(caption.get("url"))
 
             for lang_code, caption_data in info.get("subtitles", {}).items():
                 if lang_code.startswith(self.config.language.iso639_1):
                     for caption in caption_data:
                         if caption.get("ext") == "vtt":
-                            subtitle = caption.get("url")
+                            subtitles.append(caption.get("url"))
 
         return Single(
             url = url, 
             audio_url = audio_url, 
             title = metadata.title, 
             year = metadata.year,
-            subtitles = subtitle
+            subtitles = subtitles
         )
 
     def __get_best_stream(self, ytdlp_info: dict, video: bool = False, audio: bool = False) -> str:
