@@ -52,8 +52,6 @@ class YTDlpScraper(Scraper):
         metadata: Metadata, 
         _: EpisodeSelector
     ) -> Single:
-        subtitle = None
-
         watch_url = metadata.id
 
         yt_options = {
