@@ -42,7 +42,8 @@ class PyTubeScraper(Scraper):
                 id = video.watch_url, 
                 title = f"{video.title} ~ {video.author}", 
                 type = MetadataType.SINGLE, 
-                year = str(video.publish_date.year),
+                year = str(video.publish_date.year), 
+                image_url = video.thumbnail_url, 
                 extra_func = lambda: self.__scrape_extra(video)
             )
 
@@ -90,6 +91,5 @@ class PyTubeScraper(Scraper):
 
     def __scrape_extra(self, key: YouTube) -> ExtraMetadata:
         return ExtraMetadata(
-            description = key.description,
-            image_url = key.thumbnail_url,
+            description = key.description
         )
