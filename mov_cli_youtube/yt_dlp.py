@@ -2,11 +2,20 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional, Generator, Any, List, Tuple
+    from typing import Optional, Generator, Any, List, Tuple, TypedDict
 
     from mov_cli import Config
     from mov_cli.http_client import HTTPClient
     from mov_cli.scraper import ScraperOptionsT
+
+    ThumbnailData = TypedDict(
+        "ThumbnailData",
+        {
+            "url": str, 
+            "width": int, 
+            "height": int
+        }
+    )
 
 import yt_dlp
 
@@ -42,9 +51,9 @@ class YTDlpScraper(Scraper):
                 yield Metadata(
                     id = key["url"], 
                     title = f"{key['title']} ~ {key['uploader']}", 
-                    type = MetadataType.SINGLE,
+                    type = MetadataType.SINGLE, 
+                    image_url = self.__get_best_thumbnail(key["thumbnails"]), 
                     extra_func = lambda: self.__scrape_extra(key)
-                    
                 )
 
     def scrape(
@@ -113,6 +122,14 @@ class YTDlpScraper(Scraper):
         stream_formats_to_sort.sort(key = lambda x: x[0], reverse = True)
         return stream_formats_to_sort[0][1]
 
+    def __get_best_thumbnail(self, thumbnails_data: List[ThumbnailData]) -> Optional[str]:
+        """Returns the URL of the best thumbnail."""
+        if len(thumbnails_data) == 0:
+            return None
+
+        thumbnails_data.sort(key = lambda x: x["height"], reverse = True)
+        return thumbnails_data[0]["url"]
+
     def __yt_dlp_filter(self, shorts: bool = False, **kwargs):
 
         def filter(info, *, incomplete):
@@ -129,6 +146,5 @@ class YTDlpScraper(Scraper):
 
         return ExtraMetadata(
             description = info["description"],
-            image_url = info["thumbnail"],
             genres = info["categories"]
         )

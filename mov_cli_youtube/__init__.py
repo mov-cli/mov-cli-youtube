@@ -22,4 +22,4 @@ plugin: PluginHookData = {
     }
 }
 
-__version__ = "1.2.4a1"
+__version__ = "1.3a1"
