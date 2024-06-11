@@ -13,11 +13,10 @@ import sys
 from pytubefix import YouTube, Search
 
 from mov_cli.scraper import Scraper
-from mov_cli.utils import EpisodeSelector
+from mov_cli.utils import EpisodeSelector, get_temp_directory, what_platform
 from mov_cli import Single, Metadata, MetadataType, ExtraMetadata
 
 from mov_cli.media import Quality
-from mov_cli.utils import get_temp_directory, what_platform
 
 __all__ = ("PyTubeScraper",)
 
@@ -52,7 +51,7 @@ class PyTubeScraper(Scraper):
 
     def scrape(self, metadata: Metadata, _: EpisodeSelector) -> Single:
         audio_only: bool = self.options.get("audio", False)
-        subtitle = None
+        subtitles = []
 
         watch_url = metadata.id
         video = YouTube(watch_url)
@@ -80,13 +79,13 @@ class PyTubeScraper(Scraper):
                         caption.generate_srt_captions()
                     )
                 
-                subtitle = temp
+                subtitles.append(temp)
 
         return Single(
             url = url, 
             title = metadata.title, 
             year = metadata.year,
-            subtitles = subtitle
+            subtitles = subtitles
         )
 
     def __scrape_extra(self, key: YouTube) -> ExtraMetadata:
