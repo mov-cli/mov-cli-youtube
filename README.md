@@ -7,6 +7,9 @@
 
 </div>
 
+> [!WARNING]
+> The `yt-dlp` scraper WILL NOT work with custom players and mobile players as it requires the audio to be streamed separately. `pytube` should be used instead on mobile and when using custom players.
+
 ## Installation 🛠️
 Here's how to install and add the plugin to mov-cli.
 
