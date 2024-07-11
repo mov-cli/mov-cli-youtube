@@ -114,6 +114,9 @@ class YTDlpScraper(Scraper):
             if audio is True and stream_format["audio_ext"] == "none":
                 continue
 
+            if audio is True and not stream_format["language"] == self.config.language.iso639_1:
+                continue
+
             url: str = stream_format["url"]
             quality: int = stream_format["quality"]
 
