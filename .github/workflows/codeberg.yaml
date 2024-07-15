@@ -12,7 +12,6 @@ on:
 
 jobs:
     codeberg:
-        if: github.repository == 'mov-cli/mov-cli'
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -20,5 +19,5 @@ jobs:
                   fetch-depth: 0
             - uses: pixta-dev/repository-mirroring-action@674e65a7d483ca28dafaacba0d07351bdcc8bd75 # v1.1.1
               with:
-                  target_repo_url: "git@codeberg.org:mov-cli/mov-cli.git"
+                  target_repo_url: "git@codeberg.org:${{github.repository}}.git"
                   ssh_private_key: ${{ secrets.CODEBERG_SSH_PRIVATE_KEY }}
