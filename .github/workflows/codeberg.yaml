@@ -12,6 +12,7 @@ on:
 
 jobs:
     codeberg:
+        if: github.repository == 'mov-cli/mov-cli-youtube'
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
