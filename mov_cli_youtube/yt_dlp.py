@@ -80,16 +80,21 @@ class YTDlpScraper(Scraper):
                 url = self.__get_best_stream(info, audio = True)
             else:
                 url = self.__get_best_stream(info, video = True)
-                audio_url = self.__get_best_stream(info, audio = True)
 
-            for lang_code, caption_data in info.get("automatic_captions", {}).items():
-                if lang_code == self.config.language.iso639_1:
+                audio_url = self.__get_best_stream(
+                    info,
+                    audio = True,
+                    ensure_correct_audio_localisation = self.options.get("disable_audio_l10n", True)
+                )
+
+            for lang_code, caption_data in info.get("subtitles", {}).items():
+                if lang_code.startswith(self.config.language.iso639_1):
                     for caption in caption_data:
                         if caption.get("ext") == "vtt":
                             subtitles.append(caption.get("url"))
 
-            for lang_code, caption_data in info.get("subtitles", {}).items():
-                if lang_code.startswith(self.config.language.iso639_1):
+            for lang_code, caption_data in info.get("automatic_captions", {}).items():
+                if lang_code == self.config.language.iso639_1:
                     for caption in caption_data:
                         if caption.get("ext") == "vtt":
                             subtitles.append(caption.get("url"))
@@ -102,22 +107,40 @@ class YTDlpScraper(Scraper):
             subtitles = subtitles
         )
 
-    def __get_best_stream(self, ytdlp_info: dict, video: bool = False, audio: bool = False) -> str:
+    def __get_best_stream(self, ytdlp_info: dict, video: bool = False, audio: bool = False, ensure_correct_audio_localisation: bool = True) -> str:
         """Returns the best stream respecting the parameters given."""
         stream_formats_to_sort: List[Tuple[int, str]] = []
+
+        if video is False and audio is False:
+            raise ValueError("Either video or audio arg must be True in '__get_best_stream'!")
 
         for stream_format in ytdlp_info["formats"]:
 
             if video is True and stream_format["video_ext"] == "none":
                 continue
 
-            if audio is True and stream_format["audio_ext"] == "none":
-                continue
+            if audio is True:
+
+                if stream_format["audio_ext"] == "none":
+                    continue
+
+                if ensure_correct_audio_localisation and not stream_format["language"] == self.config.language.iso639_1:
+                    continue
 
             url: str = stream_format["url"]
             quality: int = stream_format["quality"]
 
             stream_formats_to_sort.append((quality, url))
+
+        # To absolutely ensure this shit doesn't blow up.
+        if len(stream_formats_to_sort) == 0 and audio is True:
+            self.logger.warning(
+                "Couldn't find the right audio for your currently selected language so audio " \
+                    "localisation will be disabled and the first audio from the YouTube video will be selected."
+            )
+            return self.__get_best_stream(
+                ytdlp_info, audio = True, ensure_correct_audio_localisation = False
+            )
 
         stream_formats_to_sort.sort(key = lambda x: x[0], reverse = True)
         return stream_formats_to_sort[0][1]

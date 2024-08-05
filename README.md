@@ -38,7 +38,14 @@ youtube = "mov-cli-youtube"
 mov-cli -s youtube nyan cat
 ```
 
-### Audio Only 🔉
+### Scraper Options ⚙️
+
+#### Audio Only 🔉
 ```sh
 mov-cli -s youtube nyan cat -- --audio
+```
+
+#### Allow Shorts 🖼️
+```sh
+mov-cli -s youtube The otter begging is adorable -- --shorts
 ```
