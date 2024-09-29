@@ -13,4 +13,4 @@ install-editable:
 	${PIP} install -e . --config-settings editable_mode=compat
 
 test:
-	ruff .
+	ruff check .
