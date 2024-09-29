@@ -21,7 +21,10 @@ import yt_dlp
 
 from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
-from mov_cli import Single, Metadata, MetadataType, ExtraMetadata
+from mov_cli.media import Media, AudioTrack, Subtitle
+from mov_cli import Single, Metadata, ExtraMetadata
+
+from .media import VideoMetadata
 
 __all__ = ("YTDlpScraper",)
 
@@ -48,17 +51,18 @@ class YTDlpScraper(Scraper):
             info = ydl.extract_info(f"ytsearch{max_videos}:{query}", download = False)
 
             for key in info["entries"]:
-                yield Metadata(
+                yield VideoMetadata(
                     id = key["url"],
                     title = f"{key['title']} ~ {key['uploader']}",
-                    type = MetadataType.SINGLE,
                     image_url = self.__get_best_thumbnail(key["thumbnails"]),
-                    extra_func = lambda: self.__scrape_extra(key)
+
+                    duration = key["duration"],
+                    view_count = key["view_count"]
                 )
 
     def scrape(
-        self, 
-        metadata: Metadata, 
+        self,
+        metadata: VideoMetadata,
         _: EpisodeSelector
     ) -> Single:
         watch_url = metadata.id
@@ -70,7 +74,7 @@ class YTDlpScraper(Scraper):
             "quiet": False if self.config.debug else True
         }
 
-        subtitles = []
+        subtitles: List[str] = []
         audio_url = None
 
         with yt_dlp.YoutubeDL(yt_options) as ydl:
@@ -99,12 +103,15 @@ class YTDlpScraper(Scraper):
                         if caption.get("ext") == "vtt":
                             subtitles.append(caption.get("url"))
 
-        return Single(
-            url = url, 
-            audio_url = audio_url, 
-            title = metadata.title, 
-            year = metadata.year,
-            subtitles = subtitles
+        return Media(
+            url = url,
+            metadata = metadata,
+            audio_tracks = [
+                AudioTrack(url = audio_url)
+            ],
+            subtitles = [
+                Subtitle(url = subtitle_url) for subtitle_url in subtitles
+            ]
         )
 
     def __get_best_stream(self, ytdlp_info: dict, video: bool = False, audio: bool = False, ensure_correct_audio_localisation: bool = True) -> str:
