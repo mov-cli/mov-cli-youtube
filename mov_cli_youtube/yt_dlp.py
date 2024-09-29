@@ -49,10 +49,10 @@ class YTDlpScraper(Scraper):
 
             for key in info["entries"]:
                 yield Metadata(
-                    id = key["url"], 
-                    title = f"{key['title']} ~ {key['uploader']}", 
-                    type = MetadataType.SINGLE, 
-                    image_url = self.__get_best_thumbnail(key["thumbnails"]), 
+                    id = key["url"],
+                    title = f"{key['title']} ~ {key['uploader']}",
+                    type = MetadataType.SINGLE,
+                    image_url = self.__get_best_thumbnail(key["thumbnails"]),
                     extra_func = lambda: self.__scrape_extra(key)
                 )
 
