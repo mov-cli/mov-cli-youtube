@@ -127,6 +127,14 @@ class YTDlpScraper(Scraper):
                 if ensure_correct_audio_localisation and not stream_format["language"] == self.config.language.iso639_1:
                     continue
 
+            if (
+                # Only filter when not "auto"
+                self.config.resolution.name != "AUTO"
+                and stream_format.get("height")
+                and stream_format["height"] > self.config.resolution.value
+            ):
+                continue
+
             url: str = stream_format["url"]
             quality: int = stream_format["quality"]
 
