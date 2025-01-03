@@ -19,9 +19,9 @@ if TYPE_CHECKING:
 
 import yt_dlp
 
+from mov_cli import ExtraMetadata, Metadata, MetadataType, Quality, Single
 from mov_cli.scraper import Scraper
 from mov_cli.utils import EpisodeSelector
-from mov_cli import Single, Metadata, MetadataType, ExtraMetadata
 
 __all__ = ("YTDlpScraper",)
 
@@ -129,7 +129,7 @@ class YTDlpScraper(Scraper):
 
             if (
                 # Only filter when not "auto"
-                self.config.resolution.name != "AUTO"
+                self.config.resolution != Quality.AUTO
                 and stream_format.get("height")
                 and stream_format["height"] > self.config.resolution.value
             ):
