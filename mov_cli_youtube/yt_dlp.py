@@ -115,17 +115,20 @@ class YTDlpScraper(Scraper):
             raise ValueError("Either video or audio arg must be True in '__get_best_stream'!")
 
         for stream_format in ytdlp_info["formats"]:
+            stream_format: dict
 
             if video is True and stream_format["video_ext"] == "none":
                 continue
 
             if audio is True:
-
                 if stream_format["audio_ext"] == "none":
                     continue
 
-                if ensure_correct_audio_localisation and not stream_format["language"] == self.config.language.iso639_1:
-                    continue
+                if ensure_correct_audio_localisation:
+                    language = str(stream_format["language"])
+
+                    if not language.startswith(self.config.language.iso639_1):
+                        continue
 
             if (
                 # Only filter when not "auto"

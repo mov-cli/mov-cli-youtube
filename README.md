@@ -19,9 +19,12 @@ Here's how to install and add the plugin to mov-cli.
 pip install mov-cli-youtube
 ```
 
-### AUR
+### PIPX
+> [!INFO]
+> If you're on Arch Linux, we now recommend you use pipx instead of your aur helper to install **mov-cli** and **your plugins**.
+
 ```sh
-yay -S python-mov-cli-youtube
+pipx inject mov-cli mov-cli-youtube
 ```
 
 2. Then add the plugin to your mov-cli config.
