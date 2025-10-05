@@ -20,7 +20,7 @@ pip install mov-cli-youtube
 ```
 
 ### PIPX
-> [!INFO]
+> [!NOTE]
 > If you're on Arch Linux, we now recommend you use pipx instead of your aur helper to install **mov-cli** and **your plugins**.
 
 ```sh
